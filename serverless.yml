@@ -1,0 +1,50 @@
+service: strapi-app
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-south-1
+
+functions:
+  app:
+    handler: index.handler
+    events:
+      - http:
+          path: strapi
+          method: get
+
+resources:
+  Resources:
+    StrapiLambdaExecutionRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: StrapiLambdaPolicy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:*
+                    - dynamodb:*
+                  Resource: "*"
+
+package:
+  exclude:
+    - node_modules/**/test/**
+    - node_modules/**/docs/**
+    - node_modules/**/example/**
+    - .git/**
+    - .idea/**
+    - .vscode/**
+    - .env
+    - .serverless/**
+    - Dockerfile
+    - .dockerignore
